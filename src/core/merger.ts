@@ -53,14 +53,15 @@ export function mergeFragments(fragments: Fragment[]): Record<string, Fragment> 
   const result: Record<string, Fragment> = {};
 
   for (const fragment of fragments) {
-    const existing = result[fragment.filename];
+    const key = `${fragment.type}/${fragment.filename}`;
+    const existing = result[key];
     if (!existing) {
-      result[fragment.filename] = fragment;
+      result[key] = fragment;
     } else {
       const existingOrder = LAYER_ORDER[existing.layer] ?? 0;
       const newOrder = LAYER_ORDER[fragment.layer] ?? 0;
       if (newOrder >= existingOrder) {
-        result[fragment.filename] = fragment;
+        result[key] = fragment;
       }
     }
   }

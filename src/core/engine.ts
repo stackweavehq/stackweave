@@ -40,7 +40,7 @@ export async function generate(configPath: string, options: GenerateOptions = {}
   );
 
   // 5. Write output
-  await cleanOutput(outputDir);
+  await cleanOutput(outputDir, configDir);
   await writeOutput(outputDir, mergeResult);
 
   console.log(`Generated .claude/ at ${outputDir}`);

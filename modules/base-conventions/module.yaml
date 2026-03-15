@@ -1,0 +1,4 @@
+name: base-conventions
+description: Universal development conventions
+layer: base
+version: 1.0.0

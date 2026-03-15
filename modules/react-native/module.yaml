@@ -1,0 +1,6 @@
+name: react-native
+description: React Native development conventions
+layer: stack
+version: 1.0.0
+dependencies:
+  - base-conventions

@@ -1,0 +1,61 @@
+{
+  "name": "stackweave",
+  "version": "2.0.0",
+  "description": "Compose .claude/ directories from reusable, stackable configuration modules — like Helm for Claude Code configs",
+  "main": "./dist/index.js",
+  "bin": {
+    "stackweave": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "modules",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "ts-node src/cli/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "claude-md",
+    "cli",
+    "config",
+    "modules",
+    "anthropic",
+    "ai",
+    "developer-tools"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stackweave/stackweave.git"
+  },
+  "homepage": "https://github.com/stackweave/stackweave#readme",
+  "bugs": {
+    "url": "https://github.com/stackweave/stackweave/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "handlebars": "^4.7.8",
+    "yaml": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.0"
+  },
+  "type": "commonjs"
+}

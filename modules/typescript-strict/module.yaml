@@ -1,0 +1,15 @@
+name: typescript-strict
+description: Strict TypeScript conventions
+layer: lang
+version: 1.0.0
+dependencies:
+  - base-conventions
+variables:
+  strict_mode:
+    type: boolean
+    default: true
+    description: Enable strict TypeScript checks
+  target:
+    type: string
+    default: "ES2022"
+    description: TypeScript compilation target

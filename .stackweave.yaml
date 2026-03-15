@@ -1,0 +1,10 @@
+project:
+  name: my-app
+  description: A React Native app with Supabase
+
+modules:
+  - base-conventions
+  - typescript-strict:
+      strict_mode: true
+      target: "ES2022"
+  - react-native

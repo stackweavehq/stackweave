@@ -1,0 +1,23 @@
+name: python
+description: Python language conventions and tooling
+layer: lang
+version: 1.0.0
+dependencies:
+  - base-conventions
+variables:
+  python_version:
+    type: string
+    default: "3.12"
+    description: Python version in use
+  formatter:
+    type: string
+    default: "ruff"
+    description: Formatter/linter in use (ruff, black, flake8)
+  package_manager:
+    type: string
+    default: "uv"
+    description: Package manager (uv, pip, poetry)
+  use_type_hints:
+    type: boolean
+    default: true
+    description: Enforce type annotations on all functions

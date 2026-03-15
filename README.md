@@ -1,5 +1,9 @@
 # stackweave
 
+[![CI](https://github.com/stackweavehq/stackweave/actions/workflows/ci.yml/badge.svg)](https://github.com/stackweavehq/stackweave/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/stackweave)](https://www.npmjs.com/package/stackweave)
+[![license](https://img.shields.io/npm/l/stackweave)](./LICENSE)
+
 **Helm for Claude Code configs.** Compose `.claude/` directories from reusable, stackable configuration modules. Declare your stack in a `.stackweave.yaml` file and let stackweave resolve dependencies, merge fragments by layer priority, interpolate variables, and write the final `.claude/` output.
 
 ## Install
@@ -102,3 +106,7 @@ Options:
 ## License
 
 MIT
+
+---
+
+Built by [Fendrel](https://fendrel.app)

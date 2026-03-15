@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# generated output
+.claude/
+
+# test coverage
+coverage/
+
+# npm pack artifacts
+*.tgz
+
+# OS
+.DS_Store
+
+# local env
+.env

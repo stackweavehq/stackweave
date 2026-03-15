@@ -9,4 +9,7 @@ export default defineConfig({
   banner: {
     js: '#!/usr/bin/env node',
   },
+  define: {
+    PKG_VERSION: JSON.stringify(require('./package.json').version),
+  },
 });

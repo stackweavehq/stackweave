@@ -1,0 +1,27 @@
+name: supabase
+description: Supabase backend conventions, RLS, and auth patterns
+layer: infra
+version: 1.0.0
+dependencies:
+  - base-conventions
+variables:
+  supabase_project_id:
+    type: string
+    default: ""
+    description: Supabase project ID (for CLI commands)
+  use_edge_functions:
+    type: boolean
+    default: true
+    description: Use Supabase Edge Functions for server logic
+  auth_providers:
+    type: string
+    default: "email"
+    description: Comma-separated auth providers (email, google, apple, github)
+  use_realtime:
+    type: boolean
+    default: false
+    description: Use Supabase Realtime subscriptions
+  client_framework:
+    type: string
+    default: "react"
+    description: Client framework (react, react-native, next, vue)

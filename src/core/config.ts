@@ -77,6 +77,20 @@ export function validateConfig(config: unknown): StackweaveConfig {
   };
 }
 
+const MODULE_NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
+
+/**
+ * Validates that a module name is safe: lowercase alphanumeric with hyphens only.
+ * Prevents path traversal (e.g. "../../etc/passwd") and other invalid names.
+ */
+export function validateModuleName(name: string): void {
+  if (!MODULE_NAME_RE.test(name)) {
+    throw new Error(
+      `Invalid module name "${name}": must match ${MODULE_NAME_RE} (lowercase alphanumeric and hyphens, must start with a letter or digit)`
+    );
+  }
+}
+
 /**
  * Normalises both the string form ("base-conventions") and the object form
  * ({ "typescript-strict": { strict_mode: true } }) of a module entry.
@@ -86,6 +100,7 @@ export function parseModuleEntry(entry: ModuleConfig): {
   variables: Record<string, unknown>;
 } {
   if (typeof entry === 'string') {
+    validateModuleName(entry);
     return { name: entry, variables: {} };
   }
 
@@ -97,6 +112,7 @@ export function parseModuleEntry(entry: ModuleConfig): {
   }
 
   const name = keys[0];
+  validateModuleName(name);
   const variables = (entry[name] ?? {}) as Record<string, unknown>;
   return { name, variables };
 }

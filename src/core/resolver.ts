@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as yaml from 'yaml';
 import { LayerName, ModuleManifest, ResolvedModule, StackweaveConfig } from '../types';
-import { parseModuleEntry } from './config';
+import { parseModuleEntry, validateModuleName } from './config';
 
 export const LAYER_ORDER: Record<LayerName, number> = {
   base: 1,
@@ -50,6 +50,7 @@ export async function loadModuleManifest(modulePath: string): Promise<ModuleMani
  * Finds the directory for a module by searching each path in searchPaths.
  */
 async function findModulePath(name: string, searchPaths: string[]): Promise<string | null> {
+  validateModuleName(name);
   for (const searchPath of searchPaths) {
     const candidate = path.join(searchPath, name);
     try {

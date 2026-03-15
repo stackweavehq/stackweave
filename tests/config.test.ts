@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
-import { parseConfig, validateConfig, parseModuleEntry } from '../src/core/config';
+import { parseConfig, validateConfig, parseModuleEntry, validateModuleName } from '../src/core/config';
 
 describe('validateConfig', () => {
   it('parses a valid config correctly', () => {
@@ -83,5 +83,35 @@ describe('parseModuleEntry', () => {
     const result = parseModuleEntry({ 'react-native': {} });
     expect(result.name).toBe('react-native');
     expect(result.variables).toEqual({});
+  });
+
+  it('throws on path traversal module name', () => {
+    expect(() => parseModuleEntry('../../etc/passwd')).toThrow(/Invalid module name/);
+  });
+
+  it('throws on path traversal in object form', () => {
+    expect(() => parseModuleEntry({ '../secret': {} })).toThrow(/Invalid module name/);
+  });
+});
+
+describe('validateModuleName', () => {
+  it.each(['typescript-strict', 'base-conventions', 'react-native', 'expo', '0-base'])(
+    'accepts valid name: %s',
+    (name) => {
+      expect(() => validateModuleName(name)).not.toThrow();
+    }
+  );
+
+  it.each([
+    ['../../etc/passwd', 'path traversal'],
+    ['../secret', 'relative path'],
+    ['My Module', 'uppercase and spaces'],
+    ['module with spaces', 'spaces'],
+    ['', 'empty string'],
+    ['UPPERCASE', 'uppercase'],
+    ['module/nested', 'slash'],
+    ['-leading-hyphen', 'leading hyphen'],
+  ])('rejects invalid name: %s (%s)', (name) => {
+    expect(() => validateModuleName(name)).toThrow(/Invalid module name/);
   });
 });

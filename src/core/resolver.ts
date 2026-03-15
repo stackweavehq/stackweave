@@ -13,6 +13,8 @@ export const LAYER_ORDER: Record<LayerName, number> = {
   project: 6,
 };
 
+const VALID_LAYERS = Object.keys(LAYER_ORDER) as LayerName[];
+
 /**
  * Reads and parses module.yaml from the given module directory.
  */
@@ -31,6 +33,11 @@ export async function loadModuleManifest(modulePath: string): Promise<ModuleMani
   }
   if (!m.layer || typeof m.layer !== 'string') {
     throw new Error(`module.yaml at ${manifestPath} missing "layer"`);
+  }
+  if (!VALID_LAYERS.includes(m.layer as LayerName)) {
+    throw new Error(
+      `Module "${m.name}": invalid layer "${m.layer}". Must be one of: ${VALID_LAYERS.join(', ')}`
+    );
   }
 
   return {

@@ -10,6 +10,8 @@ This project supports: **{{auth_providers}}**
 
 Enable only the providers listed above in the Supabase Dashboard → Authentication → Providers. Disable all others to reduce attack surface.
 
+This project uses **{{client_framework}}** — refer to the matching section below.
+
 ---
 
 ## React (`@supabase/auth-helpers-react`)
@@ -128,17 +130,17 @@ export default function RootLayout(): React.JSX.Element {
 }
 ```
 
-In `app.config.ts`, set the redirect URL:
+In `app.config.ts`, set the redirect URL scheme for your app:
 ```typescript
 export default {
-  scheme: 'myapp',
+  scheme: 'your-app-scheme', // replace with your app's URL scheme
   // ...
 };
 ```
 
 In Supabase Dashboard → Authentication → URL Configuration, add:
 ```
-myapp://auth/callback
+your-app-scheme://auth/callback
 ```
 
 ---
@@ -215,7 +217,7 @@ useEffect(() => {
 ## OAuth Login
 
 ```typescript
-// Google OAuth — example for React
+// Google OAuth — web (react, next, vue)
 async function signInWithGoogle(): Promise<void> {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -230,12 +232,12 @@ async function signInWithGoogle(): Promise<void> {
   if (error) console.error('OAuth error', error);
 }
 
-// For React Native, use the deep link scheme
+// Google OAuth — react-native (use the deep link scheme from app.config.ts)
 async function signInWithGoogle(): Promise<void> {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'myapp://auth/callback',
+      redirectTo: 'your-app-scheme://auth/callback',
     },
   });
 }

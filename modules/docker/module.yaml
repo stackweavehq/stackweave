@@ -1,0 +1,23 @@
+name: docker
+description: Docker and Docker Compose conventions for containerized applications
+layer: infra
+version: 1.0.0
+dependencies:
+  - base-conventions
+variables:
+  base_image:
+    type: string
+    default: "node:20-alpine"
+    description: Base Docker image
+  registry:
+    type: string
+    default: ""
+    description: Docker registry (e.g., ghcr.io/org, registry.example.com)
+  use_compose:
+    type: boolean
+    default: true
+    description: Use Docker Compose for local development
+  expose_port:
+    type: number
+    default: 3000
+    description: Port the application listens on

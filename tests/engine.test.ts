@@ -184,6 +184,31 @@ describe('engine.generate (integration)', () => {
     expect(tsRules).toBe('Target: ES2020');
   });
 
+  it('warns when overrides config is present', async () => {
+    const modulesDir = path.join(tmpDir, 'modules');
+    await fs.mkdir(modulesDir, { recursive: true });
+
+    await createModule(modulesDir, 'base-conventions', 'base', [], {
+      rules: { 'git.md': '# Git' },
+    });
+
+    const configPath = path.join(tmpDir, '.stackweave.yaml');
+    await fs.writeFile(
+      configPath,
+      `project:\n  name: TestApp\n\nmodules:\n  - base-conventions\n\noverrides:\n  rules: ./custom-rules\n`,
+      'utf-8'
+    );
+
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const outputDir = path.join(tmpDir, '.claude');
+    await generate(configPath, { outputDir, modulePaths: [modulesDir] });
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      "Warning: 'overrides' in config is not yet supported and will be ignored"
+    );
+    warnSpy.mockRestore();
+  });
+
   it('throws when a declared module is not found', async () => {
     const modulesDir = path.join(tmpDir, 'modules');
     await fs.mkdir(modulesDir, { recursive: true });

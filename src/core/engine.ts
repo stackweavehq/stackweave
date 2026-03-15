@@ -32,6 +32,13 @@ export async function generate(configPath: string, options: GenerateOptions = {}
   // 1. Parse config
   const config = await parseConfig(configPath);
 
+  // Warn about unsupported config sections
+  if (config.overrides && Object.keys(config.overrides).length > 0) {
+    console.warn("Warning: 'overrides' in config is not yet supported and will be ignored");
+  }
+
+  // TODO: implement overrides support
+
   // 2. Resolve modules (with transitive deps)
   const resolved = await resolveModules(config, modulePaths);
 

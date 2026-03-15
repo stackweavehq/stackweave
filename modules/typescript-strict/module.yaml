@@ -13,3 +13,11 @@ variables:
     type: string
     default: "ES2022"
     description: TypeScript compilation target
+  module_resolution:
+    type: string
+    default: "bundler"
+    description: Module resolution strategy (bundler, node16, nodenext)
+  path_aliases:
+    type: boolean
+    default: true
+    description: Enable path aliases via baseUrl/paths in tsconfig

@@ -1,6 +1,6 @@
 {
   "name": "stackweave",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Compose .claude/ directories from reusable, stackable configuration modules — like Helm for Claude Code configs",
   "main": "./dist/index.js",
   "bin": {

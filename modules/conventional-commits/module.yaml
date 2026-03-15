@@ -1,0 +1,17 @@
+name: conventional-commits
+description: Conventional Commits specification enforcement
+layer: base
+version: 1.0.0
+variables:
+  scopes:
+    type: string
+    default: ""
+    description: "Comma-separated allowed scopes (empty = any scope allowed)"
+  require_scope:
+    type: boolean
+    default: false
+    description: Whether a scope is required on every commit
+  max_subject_length:
+    type: number
+    default: 72
+    description: Maximum character length for commit subject line

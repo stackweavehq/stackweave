@@ -30,7 +30,10 @@ export async function collectFragments(
       if (!stat.isFile()) continue;
 
       const raw = await fs.readFile(filePath, 'utf-8');
-      const content = interpolate(raw, mod.variables);
+      const content = interpolate(raw, mod.variables, {
+        moduleName: mod.manifest.name,
+        filename: `${fragmentType}/${file}`,
+      });
 
       fragments.push({
         type: fragmentType,
@@ -72,9 +75,19 @@ export function mergeFragments(fragments: Fragment[]): Record<string, Fragment> 
 /**
  * Interpolates {{variable}} placeholders in content using Handlebars.
  */
-export function interpolate(content: string, variables: Record<string, unknown>): string {
-  const template = Handlebars.compile(content, { noEscape: true });
-  return template(variables);
+export function interpolate(
+  content: string,
+  variables: Record<string, unknown>,
+  context?: { moduleName: string; filename: string }
+): string {
+  try {
+    const template = Handlebars.compile(content, { noEscape: true });
+    return template(variables);
+  } catch (err) {
+    const location = context ? `${context.moduleName}/${context.filename}` : 'unknown';
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to interpolate ${location}: ${message}`);
+  }
 }
 
 /**
@@ -120,7 +133,10 @@ export async function buildClaudeMd(
       if (!stat.isFile()) continue;
 
       const raw = await fs.readFile(filePath, 'utf-8');
-      const content = interpolate(raw, mod.variables);
+      const content = interpolate(raw, mod.variables, {
+        moduleName: mod.manifest.name,
+        filename: `claude-md/${file}`,
+      });
       lines.push(content.trimEnd());
       lines.push('');
     }

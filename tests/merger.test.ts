@@ -85,6 +85,12 @@ describe('interpolate', () => {
     const content = '# No variables here';
     expect(interpolate(content, {})).toBe(content);
   });
+
+  it('throws a helpful error on malformed template syntax', () => {
+    expect(() =>
+      interpolate('Hello {{unclosed', {}, { moduleName: 'my-module', filename: 'rules/broken.md' })
+    ).toThrow(/Failed to interpolate my-module\/rules\/broken\.md/);
+  });
 });
 
 describe('collectFragments', () => {

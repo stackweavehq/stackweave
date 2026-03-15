@@ -143,12 +143,14 @@ router.get('/users/:id', asyncHandler(getUserById));
 
 ---
 
-## Validation Error Formatting from {{validation_library}}
+## Validation Error Formatting
+
+This project uses **{{validation_library}}** for request validation. Below are `validate` middleware implementations for each supported library. Use the one matching your configured `validation_library`.
 
 ### Zod
 
 ```typescript
-import { ZodSchema, ZodError } from 'zod';
+import { ZodSchema } from 'zod';
 import { RequestHandler } from 'express';
 
 export function validate(schema: ZodSchema): RequestHandler {
@@ -185,6 +187,37 @@ export function validate(schema: Joi.Schema): RequestHandler {
     }
     req.body = value;
     next();
+  };
+}
+```
+
+### Yup
+
+```typescript
+import { ObjectSchema, ValidationError } from 'yup';
+import { RequestHandler } from 'express';
+
+export function validate(schema: ObjectSchema<any>): RequestHandler {
+  return async (req, res, next) => {
+    try {
+      req.body = await schema.validate(req.body, { abortEarly: false, stripUnknown: true });
+      next();
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        const details: Record<string, string[]> = {};
+        for (const e of err.inner) {
+          const field = e.path ?? 'unknown';
+          details[field] = details[field] ?? [];
+          details[field].push(e.message);
+        }
+        return res.status(400).json({
+          error: 'Validation failed',
+          code: 'VALIDATION_ERROR',
+          details,
+        });
+      }
+      next(err);
+    }
   };
 }
 ```

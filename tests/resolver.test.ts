@@ -168,4 +168,22 @@ describe('resolveModules', () => {
     expect(names).toContain('mod-d');
     expect(resolved).toHaveLength(4);
   });
+
+  it.each(['base', 'lang', 'stack', 'infra', 'pattern', 'project'])(
+    'accepts valid layer: %s',
+    async (layer) => {
+      await createModule(tmpDir, 'test-mod', layer);
+      const config = { project: { name: 'test' }, modules: ['test-mod'] };
+      const resolved = await resolveModules(config, [tmpDir]);
+      expect(resolved[0].manifest.layer).toBe(layer);
+    }
+  );
+
+  it('throws on invalid layer value', async () => {
+    await createModule(tmpDir, 'bad-mod', 'langauge');
+    const config = { project: { name: 'test' }, modules: ['bad-mod'] };
+    await expect(resolveModules(config, [tmpDir])).rejects.toThrow(
+      /invalid layer "langauge".*Must be one of: base, lang, stack, infra, pattern, project/
+    );
+  });
 });

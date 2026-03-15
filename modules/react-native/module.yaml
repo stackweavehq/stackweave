@@ -4,3 +4,28 @@ layer: stack
 version: 1.0.0
 dependencies:
   - base-conventions
+variables:
+  navigation_library:
+    type: string
+    default: "react-navigation"
+    description: Navigation library (react-navigation)
+  state_management:
+    type: string
+    default: "zustand"
+    description: State management library (zustand, redux-toolkit, jotai)
+  min_ios:
+    type: string
+    default: "14.0"
+    description: Minimum iOS deployment target
+  min_sdk_android:
+    type: number
+    default: 24
+    description: Minimum Android SDK version
+  use_typescript:
+    type: boolean
+    default: true
+    description: Use TypeScript for all source files
+  styling:
+    type: string
+    default: "stylesheet"
+    description: Styling approach (stylesheet, nativewind, styled-components)

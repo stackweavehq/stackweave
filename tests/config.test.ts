@@ -34,6 +34,42 @@ describe('validateConfig', () => {
   it('throws when project section is missing', () => {
     expect(() => validateConfig({ modules: [] })).toThrow(/project/);
   });
+
+  it('accepts valid string and object module entries', () => {
+    const config = validateConfig({
+      project: { name: 'app' },
+      modules: ['valid', { 'also-valid': { key: 'val' } }],
+    });
+    expect(config.modules).toHaveLength(2);
+  });
+
+  it('throws on numeric module entry', () => {
+    expect(() =>
+      validateConfig({ project: { name: 'app' }, modules: [42] })
+    ).toThrow(/Module entry at index 0 is invalid.*got number/);
+  });
+
+  it('throws on null module entry', () => {
+    expect(() =>
+      validateConfig({ project: { name: 'app' }, modules: [null] })
+    ).toThrow(/Module entry at index 0 is invalid.*got null/);
+  });
+
+  it('throws on array module entry', () => {
+    expect(() =>
+      validateConfig({ project: { name: 'app' }, modules: [[]] })
+    ).toThrow(/Module entry at index 0 is invalid.*got array/);
+  });
+
+  it('throws on non-string overrides value', () => {
+    expect(() =>
+      validateConfig({
+        project: { name: 'app' },
+        modules: [],
+        overrides: { rules: 123 },
+      })
+    ).toThrow(/overrides\.rules must be a string path/);
+  });
 });
 
 describe('parseConfig', () => {

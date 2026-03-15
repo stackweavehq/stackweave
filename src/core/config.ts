@@ -35,6 +35,38 @@ export function validateConfig(config: unknown): StackweaveConfig {
     throw new Error('Invalid config: "modules" must be an array');
   }
 
+  // Validate each module entry
+  for (let i = 0; i < raw.modules.length; i++) {
+    const entry = raw.modules[i];
+    if (typeof entry === 'string') continue;
+    if (
+      typeof entry !== 'object' ||
+      entry === null ||
+      Array.isArray(entry)
+    ) {
+      throw new Error(
+        `Module entry at index ${i} is invalid: expected a string or { name: { variables } }, got ${
+          entry === null ? 'null' : Array.isArray(entry) ? 'array' : typeof entry
+        }`
+      );
+    }
+  }
+
+  // Validate overrides if present
+  if (raw.overrides !== undefined) {
+    if (typeof raw.overrides !== 'object' || raw.overrides === null || Array.isArray(raw.overrides)) {
+      throw new Error('Invalid config: "overrides" must be an object');
+    }
+    const overrides = raw.overrides as Record<string, unknown>;
+    for (const [key, value] of Object.entries(overrides)) {
+      if (typeof value !== 'string') {
+        throw new Error(
+          `Invalid config: overrides.${key} must be a string path, got ${typeof value}`
+        );
+      }
+    }
+  }
+
   return {
     project: {
       name: project.name,

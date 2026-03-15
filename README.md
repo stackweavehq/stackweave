@@ -21,22 +21,24 @@ npx stackweave generate
 ```yaml
 project:
   name: my-app
-  description: A React Native app
+  description: An Expo app with Supabase backend
 
 modules:
-  - base-conventions
+  - conventional-commits
   - typescript-strict:
       strict_mode: true
       target: "ES2022"
-  - react-native
+  - expo:
+      target_platforms: "ios,android"
+  - supabase:
+      auth_providers: "email,google"
+      client_framework: "react-native"
 ```
 
 **2. Run generate:**
 
 ```bash
 npx stackweave generate
-# or, with a custom config path:
-npx stackweave generate --config path/to/.stackweave.yaml
 ```
 
 **3. Your `.claude/` directory is ready:**
@@ -46,24 +48,46 @@ npx stackweave generate --config path/to/.stackweave.yaml
 ├── CLAUDE.md          # merged from all modules, ordered by layer
 ├── rules/
 │   ├── git-conventions.md
-│   ├── typescript-rules.md
-│   └── react-native-rules.md
-└── commands/
-    └── build-debug.md
+│   ├── typescript-patterns.md
+│   └── ...
+├── commands/
+│   ├── run-dev.md
+│   └── ...
+└── guides/
+    ├── supabase-auth.md
+    └── ...
 ```
 
-## How it works
+## Built-in modules
 
-Modules are organized into **layers** (priority order, higher wins on conflicts):
+| Module | Layer | Description |
+|--------|-------|-------------|
+| `base-conventions` | base | Git workflow, code quality, PR discipline |
+| `conventional-commits` | base | Conventional Commits spec enforcement |
+| `typescript-strict` | lang | Strict TS config, no-any rules, type safety patterns |
+| `python` | lang | PEP 8, type hints, project structure |
+| `react-native` | stack | React Native patterns, navigation, testing |
+| `expo` | stack | Expo managed workflow, EAS, Expo Router |
+| `node-express` | stack | Express.js architecture, validation, error handling |
+| `supabase` | infra | Supabase RLS, auth, migrations, Edge Functions |
+| `docker` | infra | Dockerfile + Compose best practices |
 
-| Layer     | Purpose                              | Examples                          |
-|-----------|--------------------------------------|-----------------------------------|
-| `base`    | Universal dev conventions            | `base-conventions`                |
-| `lang`    | Language-level rules                 | `typescript-strict`, `python`     |
-| `stack`   | Framework / platform                 | `react-native`, `next-js`         |
-| `infra`   | Backend services                     | `supabase`, `firebase`            |
-| `pattern` | Architectural patterns               | `offline-first`, `cqrs`           |
-| `project` | Project-specific overrides (always wins) | your local overrides          |
+## Layer system
+
+Modules are organized into **layers**. Higher layers override lower layers when fragment filenames conflict:
+
+```
+1. base → 2. lang → 3. stack → 4. infra → 5. pattern → 6. project
+```
+
+| Layer     | Purpose                         |
+|-----------|-------------------------------- |
+| `base`    | Universal dev conventions       |
+| `lang`    | Language-level rules            |
+| `stack`   | Framework / platform            |
+| `infra`   | Backend services                |
+| `pattern` | Architectural patterns          |
+| `project` | Project-specific (always wins)  |
 
 Each module is a directory with a `module.yaml` manifest and optional fragment folders (`rules/`, `commands/`, `guides/`, `agents/`, `claude-md/`).
 
@@ -84,13 +108,19 @@ variables:
     description: Enable strict checks
 ```
 
-Use `{{variable_name}}` (Handlebars syntax) in any fragment file to interpolate variables.
+Use `{{variable_name}}` (Handlebars syntax) in any fragment file to interpolate variables. Override defaults per-module in `.stackweave.yaml`:
 
-## Built-in modules
+```yaml
+modules:
+  - my-module:
+      strict_mode: false
+```
 
-- **`base-conventions`** — git workflow, conventional commits, PR discipline
-- **`typescript-strict`** — strict TS config, no-any rules, type safety patterns
-- **`react-native`** — functional components, StyleSheet, platform conventions
+## Creating custom modules
+
+Module names must be lowercase alphanumeric with hyphens, matching `/^[a-z0-9][a-z0-9-]*$/`.
+
+Place custom modules in a `modules/` directory next to your `.stackweave.yaml`. Each module needs at minimum a `module.yaml` manifest and at least one fragment file.
 
 ## CLI reference
 
@@ -102,6 +132,14 @@ Options:
   -o, --output <path>   Output directory (default: .claude/ next to config)
   -h, --help            Show help
 ```
+
+### Coming soon
+
+- `init` — scaffold a new `.stackweave.yaml`
+- `list` — list available modules
+- `validate` — check config and module integrity
+- `diff` — preview changes before writing
+- Config-level `overrides` for fragment paths
 
 ## License
 

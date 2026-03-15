@@ -1,0 +1,23 @@
+name: node-express
+description: Node.js Express API conventions and patterns
+layer: stack
+version: 1.0.0
+dependencies:
+  - base-conventions
+variables:
+  validation_library:
+    type: string
+    default: "zod"
+    description: Request validation library (zod, joi, yup)
+  use_typescript:
+    type: boolean
+    default: true
+    description: Using TypeScript
+  api_prefix:
+    type: string
+    default: "/api/v1"
+    description: API route prefix
+  auth_strategy:
+    type: string
+    default: "jwt"
+    description: Authentication strategy (jwt, session, oauth)

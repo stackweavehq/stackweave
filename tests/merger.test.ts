@@ -19,16 +19,16 @@ describe('mergeFragments', () => {
     const base = makeFragment('api-rules.md', 'base', 'base content');
     const lang = makeFragment('api-rules.md', 'lang', 'lang content');
     const result = mergeFragments([base, lang]);
-    expect(result['api-rules.md'].content).toBe('lang content');
-    expect(result['api-rules.md'].layer).toBe('lang');
+    expect(result['rules/api-rules.md'].content).toBe('lang content');
+    expect(result['rules/api-rules.md'].layer).toBe('lang');
   });
 
   it('lower layer file kept when no conflict', () => {
     const base = makeFragment('base-only.md', 'base', 'base content');
     const lang = makeFragment('lang-only.md', 'lang', 'lang content');
     const result = mergeFragments([base, lang]);
-    expect(result['base-only.md'].content).toBe('base content');
-    expect(result['lang-only.md'].content).toBe('lang content');
+    expect(result['rules/base-only.md'].content).toBe('base content');
+    expect(result['rules/lang-only.md'].content).toBe('lang content');
   });
 
   it('returns empty object for empty input', () => {
@@ -39,7 +39,7 @@ describe('mergeFragments', () => {
     const base = makeFragment('shared.md', 'base', 'base');
     const stack = makeFragment('shared.md', 'stack', 'stack');
     const result = mergeFragments([base, stack]);
-    expect(result['shared.md'].layer).toBe('stack');
+    expect(result['rules/shared.md'].layer).toBe('stack');
   });
 
   it('project layer beats all others', () => {
@@ -47,7 +47,16 @@ describe('mergeFragments', () => {
     const lang = makeFragment('shared.md', 'lang', 'lang');
     const project = makeFragment('shared.md', 'project', 'project');
     const result = mergeFragments([base, lang, project]);
-    expect(result['shared.md'].layer).toBe('project');
+    expect(result['rules/shared.md'].layer).toBe('project');
+  });
+
+  it('same filename in different types does not collide', () => {
+    const rule = makeFragment('setup.md', 'base', 'rule content', 'rules');
+    const command = makeFragment('setup.md', 'base', 'command content', 'commands');
+    const result = mergeFragments([rule, command]);
+    expect(Object.keys(result)).toHaveLength(2);
+    expect(result['rules/setup.md'].content).toBe('rule content');
+    expect(result['commands/setup.md'].content).toBe('command content');
   });
 });
 

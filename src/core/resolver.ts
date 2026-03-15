@@ -72,6 +72,7 @@ export async function resolveModules(
   searchPaths: string[]
 ): Promise<ResolvedModule[]> {
   const resolved = new Map<string, ResolvedModule>();
+  const resolving = new Set<string>();
   const userVariables = new Map<string, Record<string, unknown>>();
 
   // First pass: collect user-declared modules and their variable overrides
@@ -81,8 +82,15 @@ export async function resolveModules(
   }
 
   // Resolve a module by name, recursively resolving dependencies first
-  async function resolveOne(name: string): Promise<void> {
+  async function resolveOne(name: string, chain: string[] = []): Promise<void> {
     if (resolved.has(name)) return;
+
+    if (resolving.has(name)) {
+      const cycle = [...chain, name].join(' → ');
+      throw new Error(`Circular dependency detected: ${cycle}`);
+    }
+
+    resolving.add(name);
 
     const modulePath = await findModulePath(name, searchPaths);
     if (!modulePath) {
@@ -95,7 +103,7 @@ export async function resolveModules(
 
     // Resolve dependencies first (depth-first)
     for (const dep of manifest.dependencies ?? []) {
-      await resolveOne(dep);
+      await resolveOne(dep, [...chain, name]);
     }
 
     // Build effective variables: defaults → user overrides
@@ -107,6 +115,7 @@ export async function resolveModules(
     Object.assign(effectiveVars, overrides);
 
     resolved.set(name, { manifest, path: modulePath, variables: effectiveVars });
+    resolving.delete(name);
   }
 
   // Seed with user-declared modules (deps will be pulled in transitively)

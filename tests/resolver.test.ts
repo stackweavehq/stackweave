@@ -134,4 +134,38 @@ describe('resolveModules', () => {
     const resolved = await resolveModules(config, [tmpDir]);
     expect(resolved[0].variables.target).toBe('ES2020');
   });
+
+  it('throws on direct circular dependency (a→b→a)', async () => {
+    await createModule(tmpDir, 'mod-a', 'base', ['mod-b']);
+    await createModule(tmpDir, 'mod-b', 'lang', ['mod-a']);
+    const config = { project: { name: 'test' }, modules: ['mod-a'] };
+    await expect(resolveModules(config, [tmpDir])).rejects.toThrow(
+      /Circular dependency detected: mod-a → mod-b → mod-a/
+    );
+  });
+
+  it('throws on indirect circular dependency (a→b→c→a)', async () => {
+    await createModule(tmpDir, 'mod-a', 'base', ['mod-b']);
+    await createModule(tmpDir, 'mod-b', 'lang', ['mod-c']);
+    await createModule(tmpDir, 'mod-c', 'stack', ['mod-a']);
+    const config = { project: { name: 'test' }, modules: ['mod-a'] };
+    await expect(resolveModules(config, [tmpDir])).rejects.toThrow(
+      /Circular dependency detected: mod-a → mod-b → mod-c → mod-a/
+    );
+  });
+
+  it('resolves non-cyclic diamond dependency (a→b, a→c, b→d, c→d)', async () => {
+    await createModule(tmpDir, 'mod-d', 'base');
+    await createModule(tmpDir, 'mod-b', 'lang', ['mod-d']);
+    await createModule(tmpDir, 'mod-c', 'lang', ['mod-d']);
+    await createModule(tmpDir, 'mod-a', 'stack', ['mod-b', 'mod-c']);
+    const config = { project: { name: 'test' }, modules: ['mod-a'] };
+    const resolved = await resolveModules(config, [tmpDir]);
+    const names = resolved.map((m) => m.manifest.name);
+    expect(names).toContain('mod-a');
+    expect(names).toContain('mod-b');
+    expect(names).toContain('mod-c');
+    expect(names).toContain('mod-d');
+    expect(resolved).toHaveLength(4);
+  });
 });

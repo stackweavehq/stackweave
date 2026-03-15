@@ -7,7 +7,7 @@ const program = new Command();
 program
   .name('stackweave')
   .description('Compose .claude/ directories from reusable modules')
-  .version('2.0.0');
+  .version('0.1.0');
 
 program.addCommand(generateCommand);
 program.addCommand(initCommand);

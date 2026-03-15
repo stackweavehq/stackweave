@@ -1,0 +1,27 @@
+name: expo
+description: Expo and Expo Router conventions for React Native
+layer: stack
+version: 1.0.0
+dependencies:
+  - base-conventions
+variables:
+  router_version:
+    type: string
+    default: "v4"
+    description: Expo Router version
+  target_platforms:
+    type: string
+    default: "ios, android"
+    description: Target platforms (ios, android, web)
+  use_eas:
+    type: boolean
+    default: true
+    description: Use EAS Build and Submit
+  min_sdk_android:
+    type: number
+    default: 24
+    description: Minimum Android SDK version
+  min_ios:
+    type: string
+    default: "15.0"
+    description: Minimum iOS version

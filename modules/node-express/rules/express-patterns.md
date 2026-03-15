@@ -107,35 +107,24 @@ router.get('/users/:id', asyncHandler(getUserById));
 
 ## Request Validation
 
-7. **Validate every route that accepts input** using {{validation_library}}. Validation happens in middleware before the controller runs.
+7. **Validate every route that accepts input** using **{{validation_library}}**. Validation happens in middleware before the controller runs.
 8. **Reject invalid requests with 400 before any business logic executes** — do not let malformed data reach the service layer.
 
+### Validation Middleware Pattern
+
+Create a reusable `validate` middleware that accepts a {{validation_library}} schema, validates `req.body`, and either passes the parsed data forward or returns a 400 error with field-level details.
+
 ```typescript
-// zod schema
-const createUserSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1).max(100),
-  role: z.enum(['admin', 'member']),
-});
-
-// validation middleware
-function validate(schema: ZodSchema): RequestHandler {
-  return (req, res, next) => {
-    const result = schema.safeParse(req.body);
-    if (!result.success) {
-      return res.status(400).json({
-        error: 'Validation failed',
-        code: 'VALIDATION_ERROR',
-        details: result.error.flatten().fieldErrors,
-      });
-    }
-    req.body = result.data; // replace with parsed + coerced data
-    next();
-  };
-}
-
+// Apply validation as middleware before the controller
 router.post('/users', validate(createUserSchema), createUser);
 ```
+
+The validation middleware should:
+1. Parse/validate `req.body` against the schema
+2. On success: replace `req.body` with the parsed and coerced data, then call `next()`
+3. On failure: respond with `400` and a `VALIDATION_ERROR` body containing field-level error details
+
+See the **Express Error Handling** guide for full {{validation_library}} validation middleware implementations with error formatting.
 
 ---
 

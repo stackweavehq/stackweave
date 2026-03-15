@@ -1,11 +1,46 @@
 import * as fs from 'fs/promises';
+import * as os from 'os';
 import * as path from 'path';
 import { Fragment, MergeResult } from '../types';
 
 /**
+ * Validates that outputDir is safe to recursively delete.
+ * It must be a descendant of configDir and its basename must start with a dot.
+ */
+export function validateOutputDir(outputDir: string, configDir: string): void {
+  const resolved = path.resolve(outputDir);
+  const resolvedConfig = path.resolve(configDir);
+  const homeDir = os.homedir();
+
+  // Block root-level paths
+  if (resolved === '/' || resolved === homeDir) {
+    throw new Error(
+      `Refusing to clean "${resolved}": output directory must be inside the project root`
+    );
+  }
+
+  // Must be a descendant of configDir
+  const relative = path.relative(resolvedConfig, resolved);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error(
+      `Refusing to clean "${resolved}": output directory must be inside the project root`
+    );
+  }
+
+  // Basename must start with a dot (e.g. .claude)
+  const base = path.basename(resolved);
+  if (!base.startsWith('.')) {
+    throw new Error(
+      `Refusing to clean "${resolved}": output directory basename must start with a dot (e.g. .claude)`
+    );
+  }
+}
+
+/**
  * Removes the output directory and recreates it as empty.
  */
-export async function cleanOutput(outputDir: string): Promise<void> {
+export async function cleanOutput(outputDir: string, configDir: string): Promise<void> {
+  validateOutputDir(outputDir, configDir);
   try {
     await fs.rm(outputDir, { recursive: true, force: true });
   } catch {

@@ -9,11 +9,17 @@ export interface GenerateOptions {
   modulePaths?: string[];
 }
 
+export interface GenerateResult {
+  outputDir: string;
+  modules: string[];
+  fragmentCount: number;
+}
+
 /**
  * Main entry point for the generate pipeline:
  *   parseConfig → resolveModules → topologicalSort → merge → write
  */
-export async function generate(configPath: string, options: GenerateOptions = {}): Promise<void> {
+export async function generate(configPath: string, options: GenerateOptions = {}): Promise<GenerateResult> {
   const configDir = path.dirname(path.resolve(configPath));
 
   const outputDir = options.outputDir ?? path.join(configDir, '.claude');
@@ -43,8 +49,9 @@ export async function generate(configPath: string, options: GenerateOptions = {}
   await cleanOutput(outputDir, configDir);
   await writeOutput(outputDir, mergeResult);
 
-  console.log(`Generated .claude/ at ${outputDir}`);
-  console.log(`  Modules: ${sorted.map((m) => m.manifest.name).join(', ')}`);
-  const fragmentCount = Object.keys(mergeResult.fragments).length;
-  console.log(`  Fragments: ${fragmentCount} file(s)`);
+  return {
+    outputDir,
+    modules: sorted.map((m) => m.manifest.name),
+    fragmentCount: Object.keys(mergeResult.fragments).length,
+  };
 }
